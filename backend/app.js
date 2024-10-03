@@ -1,4 +1,13 @@
 const express = require('express'); //importe express
+const mongoose = require('mongoose');
+
+const stuffRoutes = require('./routes/stuff');
+const userRoutes = require('./routes/user');
+
+mongoose.connect('mongodb+srv://rfezxfsbj:bI6eBOcg4tEmQq88@cluster0.p81jn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
+.then(() => console.log('Connexion à MongoDB réussie !'))
+.catch((error) => console.log(error));
+/* .catch(() => console.log('Connexion à MongoDB échouée !')); */
 
 const app = express(); //contient rien pour l'instant mais on appelle la méthode qui permet de créed une apli express
 
@@ -10,34 +19,8 @@ app.use((req, res, next) => {
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS'); //d'envoyer des requêtes avec les méthodes mentionnées
     next();
 });
-
-app.post('/api/stuff', (req, res, next) => { //mettre post au dessu de GET pour eviter les pb
-    console.log(req.body);
-    res.status(201).json({
-        message: 'Objet crée'
-    });
-});
-
-app.get('/api/stuff', (req, res, next) => { //uniquement les requetes GET qu'on intercepte
-    const stuff = [
-        {
-            _id: 'oeihfzeoi',
-            title: 'Mon premier objet',
-            description: 'Les infos de mon premier objet',
-            imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-            price: 4900,
-            userId: 'qsomihvqios',
-        },
-        {
-            _id: 'oeihfzeomoihi',
-            title: 'Mon deuxième objet',
-            description: 'Les infos de mon deuxième objet',
-            imageUrl: 'https://cdn.pixabay.com/photo/2019/06/11/18/56/camera-4267692_1280.jpg',
-            price: 2900,
-            userId: 'qsomihvqios',
-        },
-    ];
-    res.status(200).json(stuff);
-})
+//toute la logique des app use est importé grace au code en dessous
+app.use('/api/stuff', stuffRoutes);
+app.use('/api/auth', userRoutes);
 
 module.exports = app;
