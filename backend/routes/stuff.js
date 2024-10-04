@@ -10,7 +10,7 @@ router.get('/', auth, stuffCtrl.getAllBooks);
 router.post('/', auth, multer, stuffCtrl.createBook);
 //pourquoi Put au dessus de get ? lecture de bas en haut ? dans le cours "Ajoutons une autre route à notre application, juste en dessous de notre route GET individuelle."
 router.get('/:id', auth, stuffCtrl.getOneBook); 
-router.put('/:id', auth, stuffCtrl.modifyBook);
+router.put('/:id', auth, multer, stuffCtrl.modifyBook); //modifier des objets
 router.delete('/:id', auth, stuffCtrl.deleteBook);
 
 module.exports = router;

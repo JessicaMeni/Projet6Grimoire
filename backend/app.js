@@ -3,6 +3,7 @@ const mongoose = require('mongoose');
 
 const stuffRoutes = require('./routes/stuff');
 const userRoutes = require('./routes/user');
+const path = require('path'); //la vidéo du cours ne l'affiche pas...
 
 mongoose.connect('mongodb+srv://rfezxfsbj:bI6eBOcg4tEmQq88@cluster0.p81jn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 .then(() => console.log('Connexion à MongoDB réussie !'))
@@ -22,5 +23,6 @@ app.use((req, res, next) => {
 //toute la logique des app use est importé grace au code en dessous
 app.use('/api/stuff', stuffRoutes);
 app.use('/api/auth', userRoutes);
+app.use('/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
