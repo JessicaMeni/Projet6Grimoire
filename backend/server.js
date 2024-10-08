@@ -1,6 +1,6 @@
 const http = require('http'); //commande pour importer le packager de Node
 //ici on importe note appli
-const app = require('./app'); //pourquoi le créer dans app js et pas direct ici ?
+const app = require('./app');
 
 const normalizePort = val => {
     const port = parseInt(val, 10);
@@ -11,10 +11,10 @@ const normalizePort = val => {
     if (port >= 0) {
       return port;
     }
-    return false; // pourquoi return false ?
+    return false;
 };
 
-const port = normalizePort(process.env.PORT || '3000');
+const port = normalizePort(process.env.PORT || '4000');
 app.set('port', port);
   
 const errorHandler = error => {

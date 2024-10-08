@@ -1,14 +1,13 @@
 const express = require('express'); //importe express
 const mongoose = require('mongoose');
 
-const stuffRoutes = require('./routes/stuff');
+const booksRoutes = require('./routes/books');
 const userRoutes = require('./routes/user');
-const path = require('path'); //la vidéo du cours ne l'affiche pas...
+const path = require('path'); //la vidéo du cours ne l'affiche pas... ?
 
 mongoose.connect('mongodb+srv://rfezxfsbj:bI6eBOcg4tEmQq88@cluster0.p81jn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch((error) => console.log(error));
-/* .catch(() => console.log('Connexion à MongoDB échouée !')); */
 
 const app = express(); //contient rien pour l'instant mais on appelle la méthode qui permet de créed une apli express
 
@@ -21,8 +20,8 @@ app.use((req, res, next) => {
     next();
 });
 //toute la logique des app use est importé grace au code en dessous
-app.use('/api/stuff', stuffRoutes);
-app.use('/api/auth', userRoutes);
-app.use('/images', express.static(path.join(__dirname, 'images')));
+app.use('/api/books', booksRoutes);
+app.use('/api/Connexion', userRoutes); // j'ai remplacé ('/api/auth', userRoutes)
+app.use('/api/images', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
