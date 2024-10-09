@@ -3,15 +3,15 @@ const Book = require ("../models/Book");
 const fs = require('fs');
 
 exports.createBook = (req, res, next) => {//mettre post au dessu de GET pour eviter les pb
-    console.log('req.body:', req.body.thing);
+    console.log('req.body:', req.body.book);
     console.log('req.file:', req.file);
-    const bookObject = JSON.parse(req.body.thing);
+    const bookObject = JSON.parse(req.body.book); // j'ai remplacé thing par book ... 
     delete bookObject._id;
     delete bookObject._userId;
     const book = new Book({
         ...bookObject, // copie les champs qui a dans le corps de la requête
         userId: req.auth.userId,
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        imageUrl: `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}` //pour correspondre à la route app.use, j'ai ajouté api/images
     }); //pour enregistrer ce book dans la base de donnée
     book.save() //
     .then(() => {res.status(201).json({message: 'Objet enregistré !'})}) //si on fait pas ça, expiration de la requête
@@ -20,8 +20,8 @@ exports.createBook = (req, res, next) => {//mettre post au dessu de GET pour evi
 
 exports.modifyBook = (req, res, next) => {
     const bookObject = req.file ? {
-        ...JSON.parse(req.body.thing),
-        imageUrl: `${req.protocol}://${req.get('host')}/images/${req.file.filename}`
+        ...JSON.parse(req.body.book),
+        imageUrl: `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}`
     } : { ...req.body }; // si ce n'est pas le cas on récup l'objet le corps de la requête
     
     delete bookObject._userId;

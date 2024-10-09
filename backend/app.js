@@ -21,7 +21,8 @@ app.use((req, res, next) => {
 });
 //toute la logique des app use est importé grace au code en dessous
 app.use('/api/books', booksRoutes);
-app.use('/api/Connexion', userRoutes); // j'ai remplacé ('/api/auth', userRoutes)
-app.use('/api/images', express.static(path.join(__dirname, 'images')));
+app.use('/api/auth', userRoutes); // pourquoi pas api Connexion alors qu'on voit cette route en frontend ? "export const APP_ROUTES = {SIGN_IN: '/Connexion'
+app.use('/api/books/bestrating', booksRoutes );
+app.use('/api/images/', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;
