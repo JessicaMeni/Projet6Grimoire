@@ -2,7 +2,7 @@ const express = require('express'); //importe express
 const mongoose = require('mongoose');
 
 const booksRoutes = require('./routes/books');
-const userRoutes = require('./routes/user');
+const userRoutes = require('./routes/user'); 
 const path = require('path'); //la vidéo du cours ne l'affiche pas... ?
 
 mongoose.connect('mongodb+srv://rfezxfsbj:bI6eBOcg4tEmQq88@cluster0.p81jn.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0')
