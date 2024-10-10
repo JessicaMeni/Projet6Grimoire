@@ -7,7 +7,10 @@ const Book = mongoose.Schema({ //c'est ok Book avec B maj ?
     imageUrl: { type: String, required: true },
     year: { type: Number, required: true },
     genre: { type: String, required: true },
-    ratings: { type: [ { userId: { type: String, required: true, }, grade: { type: Number, required: true, min: 0, max: 5, }, }, ],
+    ratings: { type: [ { 
+        userId: { type: String, required: true, }, 
+        grade: { type: Number, required: true, min: 0, max: 5, }, 
+        }, ],
     required: true,
     },
     averageRating: { type: Number, required: true },

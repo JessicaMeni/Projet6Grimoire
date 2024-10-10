@@ -13,6 +13,6 @@ router.get('/:id', stuffCtrl.getOneBook);
 router.get('/bestrating', stuffCtrl.getAllBooks) //a modifier
 router.put('/:id', auth, multer, stuffCtrl.modifyBook); //modifier des objets
 router.delete('/:id', auth, stuffCtrl.deleteBook);
-router.post('/:id/rating', auth, stuffCtrl.modifyBook) // a modif je suppose
+router.post('/:id/rating', auth, stuffCtrl.ratingBook) // Définit la note pour le user ID fourni. La note entre 0 et 5. L'ID de l'utilisateur et la note doivent être ajoutés au tableau "rating" afin de ne pas laisser un utilisateur noter deux fois le même livre.
 
 module.exports = router;
