@@ -4,7 +4,7 @@ const sharp = require("sharp");
 const fs = require('fs');
 const path = require("path");
 
-exports.createBook = (req, res, next) => {//mettre post au dessu de GET pour eviter les pb
+exports.createBook = (req, res, next) => {//POST au dessu de GET pour eviter les pb
     console.log('req.body:', req.body.book);
     console.log('req.file:', req.file);
     const bookObject = JSON.parse(req.body.book);
@@ -13,9 +13,12 @@ exports.createBook = (req, res, next) => {//mettre post au dessu de GET pour evi
     const book = new Book({
         ...bookObject, // copie les champs qui a dans le corps de la requête
         userId: req.auth.userId,
+        imageUrl: `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}`, // sans api/ ici ? ça ne fonctionne pas
+        averageRating : bookObject.ratings[0].grade //recupère la 1 note en tant que moyenne
     }); //pour enregistrer ce book dans la base de donnée
-    if (req.file) {
-        const fichierImages = `images/${req.file.originalname.split(' ').join('_').split('.')[0]}_${Date.now()}.webp`; // Chemin pour le fichier de sortie
+
+/*     if (req.file) {
+        const fichierImages = `images/${req.file.originalname.split('.')[0]}_${Date.now()}.webp`; // Chemin pour le fichier de sortie
         console.log("Buffer de l'image:", req.file.buffer);
         console.log("Taille du buffer:", req.file.size);
 
@@ -28,21 +31,23 @@ exports.createBook = (req, res, next) => {//mettre post au dessu de GET pour evi
                     return res.status(500).json({ error: "Erreur lors de la conversion de l'image" });
                 }
     
-                book.imageUrl = `${req.protocol}://${req.get('host')}/api/images/${path.basename(fichierImages)}`; //pour correspondre à la route app.use, j'ai ajouté api/images
+                book.imageUrl = `${req.protocol}://${req.get('host')}/api/images/${path.basename(fichierImages)}`;
                 book.save()
                     .then(() => res.status(201).json({ message: 'image compressée enregistrée !' }))
                     .catch(error => res.status(400).json({ error }));
             });
-    } else {
+    } else { */
+
         book.save()
         .then(() => {res.status(201).json({message: 'Objet enregistré !'})}) //si on fait pas ça, expiration de la requête
         .catch(error => {res.status(400).json( { error })})
-}};
+};
 
 exports.modifyBook = (req, res, next) => {
     const bookObject = req.file ? {
         ...JSON.parse(req.body.book)
     } : { ...req.body }; // si ce n'est pas le cas on récup l'objet le corps de la requête
+    delete bookObject._userId;
     if (req.file) {
         const fichierImages = `images/${req.file.originalname.split(' ').join('_').split('.')[0]}_${Date.now()}.webp`; // Chemin pour le fichier de sortie
 
@@ -85,7 +90,7 @@ exports.deleteBook = (req, res, next) => {
     Book.findOne({ _id: req.params.id})
         .then(book => {
             if  (book.userId != req.auth.userId){
-                res.status(401).json({message: 'Non autorisé' });
+                res.status(403).json({message: '403: unauthorized request' });
                 } else {
                     const filename = book.imageUrl.split('/images/')[1];
                     fs.unlink(`images/${filename}`, () => {
@@ -94,7 +99,6 @@ exports.deleteBook = (req, res, next) => {
                         .catch(error => res.status(401).json({ error }));
                     });
                 }
-
         })
         .catch( error => {
             console.error('Erreur lors de la recherche du livre', error);
@@ -109,7 +113,7 @@ exports.getOneBook = (req, res, next) => { //uniquement les requetes GET qu'on i
     .catch(error => res.status(404).json({ error }));
 };
 
-exports.getAllBooks = (req, res, next) => { 
+exports.getAllBooks = (req, res, next, ) => { 
     Book.find()
     .then(books => res.status(200).json(books))
     .catch(error => res.status(400).json({ error }));
@@ -118,7 +122,7 @@ exports.getAllBooks = (req, res, next) => {
 exports.ratingBook = (req, res, next) => {
     const bookId = req.params.id;
     const userId = req.auth.userId;
-    const userRating = req.body.ratings;
+    const userRating = req.body.rating;
 
     if (userRating < 1 || userRating > 5) {
         return res.status(400).json({ message: 'La note doit être comprise entre 1 et 5.'})
@@ -127,10 +131,17 @@ exports.ratingBook = (req, res, next) => {
         { $push: { ratings: { userId: userId, rating: userRating } } } // Ajouter la nouvelle note au tableau des ratings
     )
     .then(result => {
-        if (result.nModified === 0) { //si pas de modification, l'utilisateur a déjà noté l'objet
+        if (result.nModified === 0) { //si pas de modification: l'utilisateur a déjà noté l'objet
             return res.status(403).json({ error })
         } 
         res.status(200).json({ message: 'La note a été ajoutée.'})
     })
     .catch(error => res.status(500).json({ error }));
+};
+
+exports.bestRatedBooks = (req, res, next) => {
+    const bookObject = JSON.parse(req.body.Book);
+    Book.find().sort({averageRating : bookObject.rating}).limit(3)
+    .then(books => res.status(200).json(books))
+    .catch(error => res.status(400).json({ error }));
 };
