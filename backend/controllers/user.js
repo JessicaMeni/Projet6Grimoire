@@ -3,11 +3,10 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
 exports.signup = (req, res, next) => {
-    console.log(req.body); // pour vérif les données reçues
     bcrypt.hash(req.body.password, 10) //fonction de hachage de bcrypt dans notre mdp et lui demandons de «saler» le mdp 10 fois.
     .then(hash => {
         const user = new User( {
-            email: req.body.email, // créons un utilisateur et l'enregistrons
+            email: req.body.email, // créons un utilisateur et l'enregistrer
             password: hash
         });
         user.save()

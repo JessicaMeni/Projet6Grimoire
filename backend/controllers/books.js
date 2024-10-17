@@ -84,8 +84,6 @@ exports.getAllBooks = (req, res, next, ) => {
 
 exports.ratingBook = (req, res, next) => {
     const userId = req.auth.userId;
-    req.params.id
-    
     Book.findOne({_id: req.params.id})
     .then((book) => {
         if (!book) {
@@ -94,21 +92,37 @@ exports.ratingBook = (req, res, next) => {
         
         const existingRating = book.ratings.find((rating) => rating.userId === userId);
         if (existingRating) {
-            existingRating.grade = req.body.rating;
+            console.log('coucou!');
+            existingRating.grade = req.body.grade;
+            delete modRatingBook._id;
+            
+            const ratingsNumber = book.ratings.length // pour calculer la moyenne, nbr de notes
+            let totalRatings = 0;
+            book.ratings.forEach(r => {
+                totalRatings += r.grade
+            });
+            const averageRating = Math.round(totalRatings / ratingsNumber); //On récupère la moyenne en arrondissant le total divisé par le nombre de notes
+            book.averageRating = averageRating;
             book.save()
-            .then(() => res.status(200).json({message : 'Mise à jour de la note.'}))
+            .then((book) => res.status(200).json(book))
             .catch(error => res.status(500).json({ error: "Erreur lors de la modification de la note."}));
+
         } else if (req.body.rating >= 1 && req.body.rating <= 5) {
             const modRatingBook = {
                 ...req.body,
-                userId: userId,
                 grade: req.body.rating,
             };
             delete modRatingBook._id;
             book.ratings.push(modRatingBook);
-
+            const ratingsNumber = book.ratings.length // pour calculer la moyenne, nbr de notes
+            let totalRatings = 0;
+            book.ratings.forEach(r => {
+                totalRatings += r.grade
+            });
+            const averageRating = Math.round(totalRatings / ratingsNumber); //On récupère la moyenne en arrondissant le total divisé par le nombre de notes
+            book.averageRating = averageRating;
             book.save()
-                .then(() => res.status(201).json({message : 'Note ajoutée'}))
+                .then(() => res.status(200).json(book))
                 .catch(error => res.status(500).json({ error: "Erreur lors de l'ajout de la note."}));
         } else {
             res.status(400).json({ error: "La note doit être comprise entre 1 et 5." });
@@ -119,6 +133,10 @@ exports.ratingBook = (req, res, next) => {
 
 exports.bestRatedBooks = (req, res, next) => {
     Book.find().sort({averageRating : -1}).limit(3) //tri des livres par rapport aux moyenne dans l'ordre décroissant
-    .then(books => res.status(200).json(books))
+    
+    .then(book => res.status(200).json(book))
     .catch(error => res.status(400).json({ error }));
 };
+
+//http://localhost:4000/api/images/Affiches_ME_(2)1729109243873.webp
+//un secret a la note de 8/5
