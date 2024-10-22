@@ -1,7 +1,5 @@
 const path = require('path');
 const sharp = require('sharp');
-const fs = require('fs');
-
 
 const resizeImage = async (req, res, next) => {
     if (!req.file) {

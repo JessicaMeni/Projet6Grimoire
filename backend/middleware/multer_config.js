@@ -1,7 +1,6 @@
 const multer = require('multer');
 const fs = require('fs');
 
-// Je modifie diskStorage pour memoryStorage, mais j'aurai eu les même résultats (passer les fichier en webp) sans changement ?
 const storage = multer.diskStorage({ 
     destination:  (req, file, callback) => {
         fs.access("./images", (error) => {
@@ -9,7 +8,7 @@ const storage = multer.diskStorage({
                 fs.mkdirSync("./images");
             }
         });
-        callback(null, 'images') //stock img temporairement avant traitement dans temp
+        callback(null, 'images')
     },
     filename: async (req, file, callback) => {
         let name = file.originalname.split(' ').join('_');

@@ -10,7 +10,7 @@ mongoose.connect(ENV.URL_BDD)
 .then(() => console.log('Connexion à MongoDB réussie !'))
 .catch(() => console.log('Connexion à MongoDB échouée !'));
 
-const app = express(); //contient rien pour l'instant mais on appelle la méthode qui permet de créed une apli express
+const app = express(); //contient les app.use
 
 app.use(express.json());//intercepte tout content type json et nous met à disposition
 
@@ -22,8 +22,8 @@ app.use((req, res, next) => {
 });
 //toute la logique des app use est importé grace au code en dessous
 app.use('/api/books', booksRoutes);
-app.use('/api/auth', userRoutes); // pourquoi pas api Connexion alors qu'on voit cette route en frontend ? "export const APP_ROUTES = {SIGN_IN: '/Connexion'
-app.use('/api/book/:id/rating/', booksRoutes);// je dois créer une route best rating ?
+app.use('/api/auth', userRoutes);
+app.use('/api/book/:id/rating/', booksRoutes);
 app.use('/api/images/', express.static(path.join(__dirname, 'images')));
 
 module.exports = app;

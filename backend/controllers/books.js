@@ -2,7 +2,6 @@
 const Book = require ("../models/Book");
 const sharp = require("sharp");
 const fs = require('fs');
-const { error } = require("console");
 
 exports.createBook = (req, res, next) => {//POST au dessu de GET pour eviter les pb
     console.log('req.body:', req.body.book);
@@ -10,7 +9,7 @@ exports.createBook = (req, res, next) => {//POST au dessu de GET pour eviter les
     const bookObject = JSON.parse(req.body.book);
     delete bookObject._id;
     delete bookObject._userId;
-    const book = new Book({ //à quoi sert cette ligne ?
+    const book = new Book({
         ...bookObject, // copie les champs qui a dans le corps de la requête
         userId: req.auth.userId,
         imageUrl: `${req.protocol}://${req.get('host')}/api/images/${req.file.filename}`,
@@ -18,7 +17,7 @@ exports.createBook = (req, res, next) => {//POST au dessu de GET pour eviter les
     }); //pour enregistrer ce book dans la base de donnée
 
     book.save()
-        .then(() => {res.status(201).json({message: 'Objet enregistré !'})}) //si on fait pas ça, expiration de la requête
+        .then(() => {res.status(201).json({message: 'Objet enregistré !'})})
         .catch(error => {res.status(400).json( { error })})
 };
 
@@ -69,7 +68,7 @@ exports.deleteBook = (req, res, next) => {
         });
 };
 
-exports.getOneBook = (req, res, next) => { //uniquement les requetes GET qu'on intercepte
+exports.getOneBook = (req, res, next) => {
     req.params.id
     Book.findOne({ _id: req.params.id })
     .then(book => res.status(200).json(book))
@@ -92,7 +91,6 @@ exports.ratingBook = (req, res, next) => {
         
         const existingRating = book.ratings.find((rating) => rating.userId === userId);
         if (existingRating) {
-            console.log('coucou!');
             existingRating.grade = req.body.grade;
             delete modRatingBook._id;
             
@@ -105,15 +103,15 @@ exports.ratingBook = (req, res, next) => {
             book.averageRating = averageRating;
             book.save()
             .then((book) => res.status(200).json(book))
-            .catch(error => res.status(500).json({ error: "Erreur lors de la modification de la note."}));
+            .catch(error => res.status(500).json({ error }));
 
         } else if (req.body.rating >= 1 && req.body.rating <= 5) {
-            const modRatingBook = {
+            const RatingBook = {
                 ...req.body,
                 grade: req.body.rating,
             };
-            delete modRatingBook._id;
-            book.ratings.push(modRatingBook);
+            delete RatingBook._id;
+            book.ratings.push(RatingBook);
             const ratingsNumber = book.ratings.length // pour calculer la moyenne, nbr de notes
             let totalRatings = 0;
             book.ratings.forEach(r => {
@@ -123,12 +121,12 @@ exports.ratingBook = (req, res, next) => {
             book.averageRating = averageRating;
             book.save()
                 .then(() => res.status(200).json(book))
-                .catch(error => res.status(500).json({ error: "Erreur lors de l'ajout de la note."}));
+                .catch(error => res.status(500).json({ error }));
         } else {
             res.status(400).json({ error: "La note doit être comprise entre 1 et 5." });
         }
     })
-    .catch((error) => res.status(500).json({ error: "Erreur lors de la recherche de l'objet." }));
+    .catch((error) => res.status(500).json({ error}));
 };
 
 exports.bestRatedBooks = (req, res, next) => {
@@ -137,6 +135,3 @@ exports.bestRatedBooks = (req, res, next) => {
     .then(book => res.status(200).json(book))
     .catch(error => res.status(400).json({ error }));
 };
-
-//http://localhost:4000/api/images/Affiches_ME_(2)1729109243873.webp
-//un secret a la note de 8/5

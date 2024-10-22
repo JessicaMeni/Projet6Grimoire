@@ -1,6 +1,6 @@
 const mongoose = require('mongoose');
 
-const Book = mongoose.Schema({ //c'est ok Book avec B maj ?
+const Book = mongoose.Schema({
     userId: { type: String, required: true },
     title: { type: String, required: true },
     author: { type: String, required: true },
