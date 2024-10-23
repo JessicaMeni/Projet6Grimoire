@@ -1,3 +1,4 @@
+require('dotenv').config();
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
@@ -32,10 +33,11 @@ exports.login = (req, res, next) => {
                         userId: user._id,
                         token: jwt.sign( //sign pour chiffrer un nouveau token
                             { userId: user._id },
-                            'RAMDOM_TOKEN_SECRET',
+                            process.env.JWT_SECRET,
                             { expiresIn: '24h' }
                         )
                     });
+                    console.log('JWT Secret:', process.env.JWT_SECRET);
                 }
             })
             .catch(error => { res.status(500).json({ error });
@@ -44,4 +46,5 @@ exports.login = (req, res, next) => {
      })
      .catch(error => { res.status(500).json({ error });
      });
-};
+}; // mettre en place variable environnement : mongobd et token cacher fichier .env installer dotenv
+//et envoyer à bachir@sahali.fr !

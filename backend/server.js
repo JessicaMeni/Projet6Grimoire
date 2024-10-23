@@ -1,3 +1,4 @@
+require('dotenv').config();
 const http = require('http'); //commande pour importer le packager de Node
 //ici on importe note appli
 const app = require('./app');
@@ -15,6 +16,7 @@ const normalizePort = val => {
 };
 
 const port = normalizePort(process.env.PORT || '4000');
+const hostname = process.env.HOSTNAME || '127.0.0.1';
 app.set('port', port);
   
 const errorHandler = error => {
@@ -37,7 +39,11 @@ const errorHandler = error => {
     }
 };  
 
-const server = http.createServer(app); //on lui pass app
+const server = http.createServer((req, res) => { //on lui pass app
+  console.log(process.env.BASE_URL);
+  app(req, res);
+});
+
 // prend en argument la fonction qui sera appelé à chaque requete reçu par le serveur
 server.on('error', errorHandler);
 server.on('listening', () => {
@@ -46,4 +52,6 @@ server.on('listening', () => {
     console.log('Listening on ' + bind);
 });
 
-server.listen(port);
+server.listen(port, hostname, () => {
+  console.log(`Server listening on http://${hostname}:${port}`);
+});

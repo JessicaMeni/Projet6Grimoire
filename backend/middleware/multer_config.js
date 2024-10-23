@@ -8,7 +8,7 @@ const storage = multer.diskStorage({
                 fs.mkdirSync("./images");
             }
         });
-        callback(null, 'images')
+        callback(null, 'images') //stock img temporairement avant traitement dans temp
     },
     filename: async (req, file, callback) => {
         let name = file.originalname.split(' ').join('_');
